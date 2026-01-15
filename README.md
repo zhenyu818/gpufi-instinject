@@ -1,26 +1,61 @@
 # Instruction-Level Attribution Extension to gpuFI-4
 
-An extended build of **[gpuFI-4](https://github.com/caldi-uoa/gpuFI-4.git)** that adds **instruction-level attribution**: every injected fault is mapped to a specific instruction. This enables fine-grained analysis of the sensitivity of **static instructions** and their contribution to outcome categories (**Masked**, **SDC**, **DUE**). ⚡
+[![Paper](https://img.shields.io/badge/Paper-ScienceDirect-4b83c3)](https://www.sciencedirect.com/science/article/pii/S0167739X26000063)
+[![DOI](https://img.shields.io/badge/DOI-10.1016%2Fj.future.2026.108372-blue)](https://doi.org/10.1016/j.future.2026.108372)
+
+This repository is an open-source artifact accompanying our paper:
+
+**BiD-Accel: Accelerated bidimensional input-aware SDC vulnerability assessment for GPU static instructions**  
+Zhenyu Qian, Lianguo Wang, Pengfei Zhang, Jianing Rao.  
+*Future Generation Computer Systems*, Volume 180, 2026, Article 108372.  
+DOI: 10.1016/j.future.2026.108372  
+Paper: https://www.sciencedirect.com/science/article/pii/S0167739X26000063  
+Code: https://github.com/zhenyu818/gpufi-instinject
+
+It contains an extended build of **[gpuFI-4](https://github.com/caldi-uoa/gpuFI-4.git)** that adds **instruction-level attribution**: every injected fault is mapped to a specific instruction. This enables fine-grained analysis of the sensitivity of **static instructions** and their contribution to outcome categories (**Masked**, **SDC**, **DUE**). ⚡
+
+> **Upstream note:** gpuFI-4 is built on the GPGPU-Sim/Accel-Sim ecosystem (e.g., GPGPU-Sim 4.0). Please respect the licenses and citation requirements of upstream projects.
 
 > **Default target:** RTX 2060–class GPU (SM75). To target other GPUs, edit `gpgpusim.config` in the repo root and set `GPU_ARCH` in `inst_fault_inject_exp.sh` accordingly. 🛠️
 
 ---
 
+## Publication / Citation 📄
+
+If you use this repository in your research, please cite our paper:
+
+```bibtex
+@article{QIAN2026108372,
+  title = {BiD-Accel: Accelerated bidimensional input-aware SDC vulnerability assessment for GPU static instructions},
+  journal = {Future Generation Computer Systems},
+  volume = {180},
+  pages = {108372},
+  year = {2026},
+  issn = {0167-739X},
+  doi = {10.1016/j.future.2026.108372},
+  url = {https://www.sciencedirect.com/science/article/pii/S0167739X26000063},
+  author = {Zhenyu Qian and Lianguo Wang and Pengfei Zhang and Jianing Rao},
+  keywords = {GPU, Soft error, Silent data corruptions, Static instruction vulnerability, Fault injection, Input feature}
+}
+````
+
+---
+
 ## Features ✨
 
-- **Instruction-level fault attribution**
+* **Instruction-level fault attribution**
 
-  - Binds each WRITER effect to the responsible instruction (kernel, source line, instruction text).
-  - Aggregates outcomes per instruction and per source (WRITER).
-  - Optional register-name attribution via `INJ_PARAMS`.
+  * Binds each WRITER effect to the responsible instruction (kernel, source line, instruction text).
+  * Aggregates outcomes per instruction and per source (WRITER).
+  * Optional register-name attribution via `INJ_PARAMS`.
 
-- **Automated campaigns**
+* **Automated campaigns**
 
-  - Build, (optional) golden-result generation, campaign setup, execution, progress tracking, and CSV export.
+  * Build, (optional) golden-result generation, campaign setup, execution, progress tracking, and CSV export.
 
-- **Containerized workflow**
+* **Containerized workflow**
 
-  - Runs inside the published Accel-Sim Docker image for reproducibility. 📦
+  * Runs inside the published Accel-Sim Docker image for reproducibility. 📦
 
 ---
 
@@ -51,21 +86,21 @@ An extended build of **[gpuFI-4](https://github.com/caldi-uoa/gpuFI-4.git)** tha
 
 ## Repository Layout 🗂️
 
-- `inst_fault_inject_exp.sh`
+* `inst_fault_inject_exp.sh`
   Orchestrates building, optional golden-result generation, campaign setup, progress tracking, and CSV export via `analysis_fault.py`.
 
-- `campaign_exec.sh`, `campaign_profile.sh`
+* `campaign_exec.sh`, `campaign_profile.sh`
   Injection runner and profiling helper; configure injection parameters and collect per-run logs/effects.
 
-- `analysis_fault.py`
+* `analysis_fault.py`
   Parses `inst_exec.log` and writes per-instruction CSV summaries to `test_result/`.
 
-- `test_apps/`
+* `test_apps/`
 
-  - Each subfolder name is an application (e.g., `Pathfinder`, `Stencil1D`).
-  - `result_gen/`: Programs that generate **Golden Results**. When `DO_RESULT_GEN=1`, outputs go to `test_apps/<app>/result/`.
-  - `inject_app/`: Programs used during fault injection to compare against Golden Results.
-  - `size_list.txt`: One command-line parameter set per line. Both `inject_app` and `result_gen` may contain multiple programs to support multiple input sets; **program names in both folders must match**.
+  * Each subfolder name is an application (e.g., `Pathfinder`, `Stencil1D`).
+  * `result_gen/`: Programs that generate **Golden Results**. When `DO_RESULT_GEN=1`, outputs go to `test_apps/<app>/result/`.
+  * `inject_app/`: Programs used during fault injection to compare against Golden Results.
+  * `size_list.txt`: One command-line parameter set per line. Both `inject_app` and `result_gen` may contain multiple programs to support multiple input sets; **program names in both folders must match**.
 
 ---
 
@@ -85,13 +120,13 @@ An extended build of **[gpuFI-4](https://github.com/caldi-uoa/gpuFI-4.git)** tha
 
 | Code | Component    |
 | :--: | ------------ |
-|  0   | `RF`         |
-|  1   | `local_mem`  |
-|  2   | `shared_mem` |
-|  3   | `L1D_cache`  |
-|  4   | `L1C_cache`  |
-|  5   | `L1T_cache`  |
-|  6   | `L2_cache`   |
+|   0  | `RF`         |
+|   1  | `local_mem`  |
+|   2  | `shared_mem` |
+|   3  | `L1D_cache`  |
+|   4  | `L1C_cache`  |
+|   5  | `L1T_cache`  |
+|   6  | `L2_cache`   |
 
 > Example: `COMPONENT_SET=0:1` flips both **RF** and **local_mem**.
 
@@ -99,11 +134,14 @@ An extended build of **[gpuFI-4](https://github.com/caldi-uoa/gpuFI-4.git)** tha
 
 ## Running an Experiment 🧪
 
-1. **Start the container** (see _Quick Start_).
+1. **Start the container** (see *Quick Start*).
+
 2. **Configure `inst_fault_inject_exp.sh`**
    Set `TEST_APP_NAME`, `COMPONENT_SET`, `INJECT_BIT_FLIP_COUNT`, `RUN_PER_EPOCH`, `GPU_ARCH`, `DO_BUILD`, `DO_RESULT_GEN`.
+
 3. **Verify inputs**
    Ensure your app’s `size_list.txt` contains one parameter set per line.
+
 4. **Launch**
 
    ```bash
@@ -113,7 +151,7 @@ An extended build of **[gpuFI-4](https://github.com/caldi-uoa/gpuFI-4.git)** tha
 5. **Review results**
    Live progress is printed; summaries are exported to `test_result/` as:
 
-   ```
+   ```text
    test_result_<app>_<test>_<components>_<bitflip>.csv
    ```
 
@@ -121,29 +159,54 @@ An extended build of **[gpuFI-4](https://github.com/caldi-uoa/gpuFI-4.git)** tha
 
 ## Outputs & Logs 📊
 
-- `inst_exec.log` — Aggregated run log with effects, parameters, and results.
-- `test_result/` — Per-instruction CSV summaries for the current run.
-- `logs*/` — Per-batch temporary output (cleaned depending on script options).
+* `inst_exec.log` — Aggregated run log with effects, parameters, and results.
+* `test_result/` — Per-instruction CSV summaries for the current run.
+* `logs*/` — Per-batch temporary output (cleaned depending on script options).
 
 ---
 
 ## What’s New vs. gpuFI-4 🆕
 
-- **Instruction-level attribution for fault effects**
+* **Instruction-level attribution for fault effects**
 
-  - Binds each WRITER effect to the responsible instruction (kernel, source line, instruction text), enabling fine-grained sensitivity analysis.
-  - Aggregates outcomes per instruction and per source (WRITER), with optional register-name attribution from `INJ_PARAMS`.
+  * Binds each WRITER effect to the responsible instruction (kernel, source line, instruction text), enabling fine-grained sensitivity analysis.
+  * Aggregates outcomes per instruction and per source (WRITER), with optional register-name attribution from `INJ_PARAMS`.
 
 ---
 
 ## Notes & Tips 📝
 
-- With `DO_RESULT_GEN=1`, programs in `result_gen/` automatically produce Golden Results under `test_apps/<app>/result/`.
-- The injector can target explicit **PTX register names** (see `campaign_exec.sh`) for fine-grained, register-level injections.
-- To target GPUs other than SM75, update both `gpgpusim.config` and `GPU_ARCH`.
+* With `DO_RESULT_GEN=1`, programs in `result_gen/` automatically produce Golden Results under `test_apps/<app>/result/`.
+* The injector can target explicit **PTX register names** (see `campaign_exec.sh`) for fine-grained, register-level injections.
+* To target GPUs other than SM75, update both `gpgpusim.config` and `GPU_ARCH`.
+
+---
+
+## Upstream Projects & Attribution 🔗
+
+This repository is **based on** and **extends** the following upstream projects:
+
+* **gpuFI-4** (fault injection framework): [https://github.com/caldi-uoa/gpuFI-4.git](https://github.com/caldi-uoa/gpuFI-4.git)
+* **GPGPU-Sim / Accel-Sim ecosystem** (GPU simulation infrastructure, including GPGPU-Sim 4.0):
+  [https://github.com/gpgpu-sim/gpgpu-sim_distribution](https://github.com/gpgpu-sim/gpgpu-sim_distribution)
+  [https://github.com/accel-sim/accel-sim-framework](https://github.com/accel-sim/accel-sim-framework)
+
+Please follow upstream **licenses**, keep their copyright headers intact,
+and cite upstream papers/tools when required by their documentation.
 
 ---
 
 ## Acknowledgments 🙌
 
-Built on top of **gpuFI-4**. Thanks to the authors and the broader **GPGPU-Sim / Accel-Sim** communities for their tools and documentation.
+Built on top of **gpuFI-4** and the broader **GPGPU-Sim / Accel-Sim** communities and tooling. Thanks to the authors and maintainers for their open-source contributions.
+
+---
+
+## License ⚖️
+
+This repository contains code derived from upstream projects. Please check:
+
+* the `LICENSE` file in this repository (if present), and
+* the licenses and citation requirements of upstream dependencies linked above.
+
+If you redistribute or publish results, ensure compliance with all applicable upstream licenses.
